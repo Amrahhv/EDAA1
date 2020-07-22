@@ -1,0 +1,66 @@
+x <- read.table("household_power_consumption.txt", header=T, sep = ";")
+y <- subset(x, x$Date == "2/2/2007")
+z <- subset(x, x$Date == "1/2/2007")
+data <- rbind(y, z)
+library(data.table)
+png("plot1.png", width = 480, height = 480)
+hist(as.numeric(data$Global_active_power), col = "red", 
+                main = "Global Active Power", 
+                xlab = "KW", 
+                ylab = "Freq")
+dev.off()
+
+——————
+
+x <- read.table("household_power_consumption.txt", header=T, sep = ";")
+y <- subset(x, x$Date == "2/2/2007")
+z <- subset(x, x$Date == "1/2/2007")
+data <- rbind(y, z)
+library(data.table)
+data$Time <- as.Date(data$Date, '%d/%m/%Y')
+data$Global_active_power <- as.numeric(data$Global_active_power)
+xlim_min = as.POSIXct(strftime("2007-02-01 00:00:00"))
+xlim_max = as.POSIXct(strftime("2007-02-03 00:00:00"))
+
+png("plot2.png", width = 480, height = 480)
+
+plot(data$Time, data$Global_active_power,
+     xlim = c(xlim_min, xlim_max),
+     type = "l",
+     xlab = "",
+     ylab = "Global Active Power (kw)"
+)
+axis.POSIXct(1, at = seq(xlim_min, xlim_max, by = "day"),
+             format = "%a")
+
+dev.off()
+
+————————
+
+x <- read.table("household_power_consumption.txt", header=T, sep = ";")
+y <- subset(x, x$Date == "2/2/2007")
+z <- subset(x, x$Date == "1/2/2007")
+data <- rbind(y, z)
+library(data.table)
+png("plot3.png", width=480, height=480)
+datetime <- strptime(paste(data$Date, data$Time, sep=" "), "%d/%m/%Y %H:%M:%S")
+plot(datetime, data$Sub_metering_1, type="l", xlab="", ylab="Energy sub metering",col="green",ylim=c(0,40))
+par(new=TRUE)
+plot(datetime, data$Sub_metering_2, type="l", xlab="", ylab="",col="red",ylim=c(0,40))
+par(new=TRUE)
+plot(datetime, data$Sub_metering_3, type="l", xlab="", ylab="",col="blue",ylim=c(0,40))
+legend("topright",legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),lty=1,col=c("green","red","blue"))
+dev.off()
+
+——————————————
+
+with(smallpow,{
+  plot(smallpow$Time,as.numeric(as.character(smallpow$Global_active_power)),type="l",  xlab="",ylab="Global Active Power")  
+  plot(smallpow$Time,as.numeric(as.character(smallpow$Voltage)), type="l",xlab="datetime",ylab="Voltage")
+  plot(smallpow$Time,smallpow$Sub_metering_1,type="n",xlab="",ylab="Energy sub metering")
+  with(smallpow,lines(Time,as.numeric(as.character(Sub_metering_1))))
+  with(smallpow,lines(Time,as.numeric(as.character(Sub_metering_2)),col="red"))
+  with(smallpow,lines(Time,as.numeric(as.character(Sub_metering_3)),col="blue"))
+  legend("topright", lty=1, col=c("black","red","blue"),legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"), cex = 0.6)
+  plot(smallpow$Time,as.numeric(as.character(smallpow$Global_reactive_power)),type="l",xlab="datetime",ylab="Global_reactive_power")
+})
